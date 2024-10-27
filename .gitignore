@@ -1,0 +1,7 @@
+*.deb
+depends.txt
+container/
+winetricks/
+node_modules/
+package.json
+package-lock.json
