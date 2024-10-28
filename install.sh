@@ -64,7 +64,7 @@ fi
 ROOTFS="$PREFIX/var/lib/proot-distro/installed-rootfs/debian"
 if ! [[ -d "$ROOTFS" ]]; then
   info "Installing debian with proot..."
-  proot-distro install debian \
+  proot-distro install debian &> /dev/null \
     || die_can_rerun "Failed to install debian"
 fi
 
@@ -85,11 +85,11 @@ export PATH="$PATH:$HOME/.local/bin"
 
 if [[ -d "wine-desktop-installer" ]]; then
   info "Using exist wine-desktop-installer, try to update"
-  (cd "wine-desktop-installer" && git pull) \
+  (cd "wine-desktop-installer" && git pull &> /dev/null) \
     || warn "Failed to update wine-desktop-installer, but ignore it"
 else
   info "Getting wine-desktop-installer"
-  git clone "https://github.com/Huzerovo/wine-desktop-installer" \
+  git clone "https://github.com/Huzerovo/wine-desktop-installer" &> /dev/null \
     || die_can_rerun "Failed to clone wine-desktop-installer"
 fi
 
@@ -116,6 +116,7 @@ unset ROOTFS_CACHE
 info "Termux installation Done."
 warn "Going to login installation"
 
+# do login-installation
 RETRY=0
 while ! { proot-distro login \
   --bind "$HOME":"/mnt/termux-home" \
@@ -135,4 +136,9 @@ while ! { proot-distro login \
 done
 unset RETRY
 
+# do packages-installation
+warn "Going to packages installation"
 proot-distro login debian
+
+warn "Ready to build and install wine-desktop-installer"
+start-debian

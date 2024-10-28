@@ -65,6 +65,20 @@ apt-get install -yqq -o Dpkg::Options::="--force-confdef" \
 
 rm "/etc/profile.d/packages-installation.sh"
 
+cat > "/etc/profile.d/installer-installation.sh" <<-__EOF__
+#!/usr/bin/bash
+
+if [[ -n "\$WINE_DESKTOP_CONTAINER" ]]; then
+  echo "First install"
+  cd "\$WINE_DESKTOP_CONTAINER"
+  chmod +x "\$WINE_DESKTOP_CONTAINER/updater"
+  bash "\$WINE_DESKTOP_CONTAINER/updater"
+  sudo rm "/etc/profile.d/installer-installation.sh"
+  echo "OK, please relogin"
+  exit 0
+fi
+__EOF__
+
 info "Everything is OK. =v="
 info "Use 'start-debian' to login"
 exit 0

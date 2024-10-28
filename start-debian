@@ -15,13 +15,18 @@ CLEAR_ANDROID_ENV=0
 # if set to 1, remove termux bin and android bin in PATH
 ISOLATED_PATH=0
 
+declare -a PROOT_ARGS
+# See 'proot-distro login --help'
+# you can add proot arguments here
+PROOT_ARGS=()
+
+# DO NOT EDIT BELOW CONFIG
 # those are configurated by login installation
 PROOT_USER="root"
 PROOT_HOME="/root"
-WINE_DESKTOP_CONTAINER="$PROOT_HOME/.cache/wine-desktop"
+WINE_DESKTOP_CONTAINER="$PROOT_HOME/.local/share/wine-desktop"
 
-# See 'proot-distro login --help'
-PROOT_ARGS=(
+PROOT_ARGS+=(
   --env RESOLUTION="$RESOLUTION"
   --env DISPLAY="$DISPLAY"
   --env CLEAR_ANDROID_ENV="$CLEAR_ANDROID_ENV"
