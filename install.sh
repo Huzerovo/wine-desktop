@@ -85,8 +85,10 @@ export PATH="$PATH:$HOME/.local/bin"
 
 if [[ -d "wine-desktop-installer" ]]; then
   info "Using exist wine-desktop-installer, try to update"
-  (cd "wine-desktop-installer" && git pull &> /dev/null) \
-    || warn "Failed to update wine-desktop-installer, but ignore it"
+  (cd "wine-desktop-installer" && {
+    # try to update or force rebase
+    git pull &> /dev/null || git rebase &> /dev/null ;
+  }) || warn "Failed to update wine-desktop-installer, but ignore it"
 else
   info "Getting wine-desktop-installer"
   git clone "https://github.com/Huzerovo/wine-desktop-installer" &> /dev/null \
