@@ -1,7 +1,3 @@
-*.deb
-depends.txt
-container/
-winetricks/
 node_modules/
 wine-desktop-installer/
 package.json

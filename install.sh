@@ -83,6 +83,7 @@ warn " - fish, add 'export \$PATH=\"\$PATH:\$HOME/.local/bin\"' to '$HOME/.confi
 warn " - zsh, add 'export \$PATH=\"\$PATH:\$HOME/.local/bin\"' to '$HOME/.zshrc'"
 export PATH="$PATH:$HOME/.local/bin"
 
+# update wine-desktop-installer
 if [[ -d "wine-desktop-installer" ]]; then
   info "Using exist wine-desktop-installer, try to update"
   (cd "wine-desktop-installer" && {
@@ -97,20 +98,17 @@ fi
 
 # NOTE: all installation stored in /var/cache (next installation in /etc/profile.d)
 # NOTE: all files stored in /var/cache/wine-desktop
-# install wine-desktop-installer
+# copy wine-desktop-installer to proot
 ROOTFS_CACHE="$ROOTFS/var/cache"
 info "Install wine-desktop-installer to proot"
-# main wine installer
 if [[ -d "$ROOTFS_CACHE/wine-desktop" ]]; then
-  rm -r "$ROOTFS_CACHE/wine-desktop"
+  rm -rf "$ROOTFS_CACHE/wine-desktop"
 fi
 cp -r "./wine-desktop-installer" "$ROOTFS_CACHE/wine-desktop"
 
 # install login-installation
 mkdir -p "$ROOTFS/etc/profile.d"
 cp "./login-installation.sh" "$ROOTFS/etc/profile.d/login-installation.sh"
-# install installation script
-cp "./packages-installation.sh" "$ROOTFS_CACHE"
 
 unset ROOTFS
 unset ROOTFS_CACHE
@@ -138,9 +136,5 @@ while ! { proot-distro login \
 done
 unset RETRY
 
-# do packages-installation
-warn "Going to packages installation"
-proot-distro login debian
-
-warn "Ready to build and install wine-desktop-installer"
+info "Ready to build and install wine-desktop-installer"
 start-debian
