@@ -77,8 +77,9 @@ WINE_DESKTOP_CONTAINER="$PROOT_HOME/.local/share/wine-desktop"
 
 if [[ -d "$PROOT_HOME" ]]; then
   # update old installation
+  mkdir -p "$WINE_DESKTOP_CONTAINER"
   cp -rf "/var/cache/wine-desktop" "$(dirname "$WINE_DESKTOP_CONTAINER")"
-  chown "$PROOT_USER":"$PROOT_USER" -R "$PROOT_HOME"
+  # chown "$PROOT_USER":"$PROOT_USER" -R "$PROOT_HOME"
   rm -rf "/var/cache/wine-desktop"
 else
   warn "User is created but can not find the home."
@@ -110,13 +111,13 @@ else
 fi
 
 info "Updating..."
-apt-get update -yqq \
+apt-get update -yqq &> /dev/null \
   || warn "Failed to update, ignored."
-apt-get upgrade -yqq -o Dpkg::Options::="--force-confdef" \
+apt-get upgrade -yqq -o Dpkg::Options::="--force-confdef" &> /dev/null \
   || warn "Failed to upgrade, ignored"
 
 info "Installing 'sudo'..."
-apt-get install -yqq -o Dpkg::Options::="--force-confdef" sudo \
+apt-get install -yqq -o Dpkg::Options::="--force-confdef" sudo &> /dev/null \
   || die_can_rerun "Failed to insatll package 'sudo'"
 
 if ! [[ "$PROOT_USER" == "root" ]]; then
