@@ -141,7 +141,6 @@ cat > "/etc/profile.d/installer-installation.sh" <<-__EOF__
 
 if [[ -n "\$WINE_DESKTOP_CONTAINER" ]]; then
   cd "\$WINE_DESKTOP_CONTAINER"
-  chmod +x "\$WINE_DESKTOP_CONTAINER/updater"
   bash "\$WINE_DESKTOP_CONTAINER/updater"
   sudo rm "/etc/profile.d/installer-installation.sh"
   echo "OK, please relogin"
