@@ -133,7 +133,7 @@ fi
 info "Installing others packages..."
 warn "Depending on your network, it may take a long time."
 apt-get install -yqq -o Dpkg::Options::="--force-confdef" \
-  git wget dpkg-dev cmake dh-cmake &> /dev/null \
+  git wget dpkg-dev cmake gcc-arm-linux-gnueabihf dh-cmake &> /dev/null \
   || warn "Failed to install some required packages, but can ignore it."
 
 # install wine-desktop-installer next login
