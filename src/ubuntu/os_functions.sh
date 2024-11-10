@@ -1,7 +1,13 @@
 os_update_mirrors() {
-  # Replace http://ports.ubuntu.com/ubuntu-ports
+  apt-get update &> /dev/null
+  apt-get install -yqq apt-transport-https ca-certificates &> /dev/null
   cp "/etc/apt/sources.list" "/etc/apt/sources.list.backup"
-  sed -i -E -r 's/(http|https):\/\/ports\.ubuntu\.com\/ubuntu-ports/https:\/\/mirrors\.tuna\.tsinghua\.edu\.cn\/ubuntu/' "/etc/apt/sources.list"
+  cat > "/etc/apt/sources.list" << __EOF__
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ noble main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ noble-updates main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ noble-backports main restricted universe multiverse
+deb https://security.ubuntu.com/ubuntu/ noble-security main restricted universe multiverse
+__EOF__
 }
 
 os_upgrade_packages() {
