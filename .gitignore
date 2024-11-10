@@ -2,3 +2,7 @@ node_modules/
 wine-desktop-installer/
 package.json
 package-lock.json
+install.sh
+config.sh
+login-installation.sh
+start-wine-desktop

@@ -47,20 +47,36 @@ Wine并不保证能够完全兼容Windows软件。
 [wine桌面安装器](https://github.com/Huzerovo/wine-desktop-installer)提供了一个
 方便的命令。
 
+## config.sh
+
+目前只有一个选项
+
+- **CONFIG_OS**: 应为`debian`或`ubuntu`
+ > **CONFIG_OS**推荐设置为`ubuntu`，
+ > debian缺少编译turnip驱动的所需一个包`libllvmspirvlib16`，
+ > 导致不能在debian上使用GPU硬件加速。
+
 ## 项目怎么用？
 
-1. 下载[Termux](https://github.com/termux/termux-app)与
+1. 下载并安装[Termux](https://github.com/termux/termux-app)与
    [Termux-X11](https://github.com/termux/termux-x11)
-2. `git clone https://github.com/Huzerovo/wine-desktop.git`下载本项目
-3. 切换到项目文件夹，并运行`chmod +x ./install.sh && ./install.sh`
-4. 按照提示完成安装，若中间的安装出错，可尝试重新执行`./install.sh`重试安装
+2. 运行以下代码
+   ```bash
+   git clone https://github.com/Huzerovo/wine-desktop.git
+   cd wine-desktop
+   cp src/config.sh
+   vim config.sh # 可选，编辑config.sh
+   bash build.sh --all
+   bash install.sh
+   ```
+3. 按照提示完成安装，若中间的安装出错，可尝试重新执行`bash install.sh`重试安装
 
 ## 一些注意事项
 
 - 使用了`proot-distro`模拟了一个Debian Linux环境
-- 有一个快捷程序`start-debian`安装在了`$HOME/.local/bin`
+- 有一个快捷程序`start-wine-desktop`安装在了`$HOME/.local/bin`
 - 安装时会附带安装[wine桌面安装器](https://github.com/Huzerovo/wine-desktop-installer)。
-  你可以使用`start-debian`切换到PRoot后，在`.local/share/wine-desktop`找到它
+  你可以使用`start-wine-desktop`切换到PRoot后，在`.local/share/wine-desktop`找到它
 - 需要一个流程的网络环境
 - 项目大概自用，维护看心情。~~反正也没人用òᆺó~~
 - 有问题也可以在issues提一下
