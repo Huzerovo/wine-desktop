@@ -4,8 +4,8 @@ source config.sh
 source check_config.sh
 source common.sh
 
-# shellcheck disable=SC1091
-source "$CONFIG_OS/os_functions.sh"
+# shellcheck disable=SC1090,SC1091
+source $CONFIG_OS/os_functions.sh
 
 user_exist() {
   grep -e "^$1:" /etc/passwd &> /dev/null
