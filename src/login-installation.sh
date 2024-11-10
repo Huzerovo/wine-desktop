@@ -78,9 +78,9 @@ create_wine_desktop() {
 }
 
 update_start_bin() {
-  # config the start-wine-destop
+  # config the start-wine-desktop
   local start_bin
-  start_bin="/mnt/termux-home/.local/bin/start-wine-destop"
+  start_bin="/mnt/termux-home/.local/bin/start-wine-desktop"
   if [[ -w "$start_bin" ]]; then
     sed -i -E -r "/^PROOT_USER=.*$/c\PROOT_USER=\"$PROOT_USER\"" "$start_bin"
     sed -i -E -r "/^PROOT_HOME=.*$/c\PROOT_HOME=\"$PROOT_HOME\"" "$start_bin"
@@ -108,7 +108,8 @@ update_mirrors() {
 }
 
 upgrade_packages() {
-  os_upgrade_packages
+  info "Upgrading packages..."
+  os_upgrade_packages &> /dev/null
 }
 
 __grant_sudo_privilege() {
@@ -123,7 +124,7 @@ __grant_sudo_privilege() {
 
 install_packages() {
   info "Installing 'sudo'..."
-  os_install_packages "sudo" \
+  os_install_packages "sudo" &> /dev/null \
     || die_can_retry "Failed to install package 'sudo'"
 
   if ! [[ "$PROOT_USER" == "root" ]]; then
@@ -158,7 +159,7 @@ install_packages() {
       die "Unsupport os: $CONFIG_OS"
       ;;
   esac
-  os_install_packages "${packages[@]}" \
+  os_install_packages "${packages[@]}" &> /dev/null \
     || warn "Failed to install some required packages, but can ignore it."
 }
 
@@ -170,8 +171,11 @@ install_installer_installation() {
 if [[ -n "\$WINE_DESKTOP_CONTAINER" ]]; then
   cd "\$WINE_DESKTOP_CONTAINER"
   bash "\$WINE_DESKTOP_CONTAINER/updater"
+  # Do installation for install wine, winetricks, box
+  # TODO: finish wine-desktop-installer for ubuntu and uncomment it
+  # wine-desktop-installer --all
   sudo rm "/etc/profile.d/installer-installation.sh"
-  echo "OK, please relogin"
+  printf "\033[;32m%s\033[0m\n" "OK, please use command 'start-wine-desktop' to relogin"
   exit 0
 fi
 __EOF__
@@ -180,8 +184,8 @@ __EOF__
 main() {
   info "Welcome to login-installation."
 
-  PROOT_USER="root"
-  PROOT_HOME="/root"
+  export PROOT_USER="root"
+  export PROOT_HOME="/root"
   choose_user
   # NOTE: choose_user will change PROOT_USER and PROOT_HOME
   WINE_DESKTOP_CONTAINER="$PROOT_HOME/.local/share/wine-desktop"
