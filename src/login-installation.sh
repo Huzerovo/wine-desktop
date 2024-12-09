@@ -134,6 +134,11 @@ install_packages() {
   info "Installing others packages..."
   warn "Depending on your network, it may take a long time."
   local packages
+  # TODO: remove 'dpkg-dev' and 'dh-cmake', they are required by building
+  #       deb package for box64 and box86, but don't need now because they are
+  #       installed by 'make install' now.
+  # TODO: move 'gcc-arm-linux-gnueabihf' to wine-desktop-installer, install it
+  #       when try to install box86
   case "$CONFIG_OS" in
     debian)
       packages=(
