@@ -64,8 +64,8 @@ Wine并不保证能够完全兼容Windows软件。
    ```bash
    git clone https://github.com/Huzerovo/wine-desktop.git
    cd wine-desktop
-   cp src/config.sh
-   vim config.sh # 可选，编辑config.sh
+   cp src/config.sh . # 可选，配置选项
+   # 编辑config.sh
    bash build.sh --all
    bash install.sh
    ```

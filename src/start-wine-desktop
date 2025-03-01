@@ -1,7 +1,5 @@
 #!/usr/bin/bash
 
-source config.sh
-source check_config.sh
 source common.sh
 
 unset LD_PRELOAD
@@ -61,7 +59,7 @@ wine_desktop_login() {
 
   echo $LOGIN_COUNT > "$LOGIN_LOCK"
 
-  proot-distro login "${PROOT_ARGS[@]}" "$CONFIG_OS"
+  proot-distro login "${PROOT_ARGS[@]}" "ubuntu"
 
   # Logout, check if need to clean files
   LOGIN_COUNT=$(cat "$LOGIN_LOCK")
@@ -94,7 +92,6 @@ wine_desktop_login() {
   unset LOGIN_COUNT
 }
 
-check_config_os
 wine_desktop_login
 info "Welcome back"
 

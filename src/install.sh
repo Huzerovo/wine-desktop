@@ -1,7 +1,5 @@
 #!/usr/bin/bash
 
-source config.sh
-source check_config.sh
 source common.sh
 
 check_env() {
@@ -13,8 +11,7 @@ check_env() {
   if [[ -z "$PREFIX" ]]; then
     export PREFIX="/data/data/com.termux/files/usr"
     if ! [[ -d "$PREFIX" ]]; then
-      erro "Can not find Termux prefix: '$PREFIX'"
-      die "Are you sure you are running in Termux?"
+      die "Can not find Termux prefix: '$PREFIX'"
     fi
     warn "env PREFIX is not set, set to '$PREFIX'"
   fi
@@ -22,25 +19,26 @@ check_env() {
   # check home
   if [[ -z "$HOME" ]]; then
     export HOME="/data/data/com.termux/files/home"
+    if ! [[ -d "$HOME" ]]; then
+      die "Can not find Termux home: '$HOME'"
+    fi
     warn "env HOME is not set, set to '$HOME'"
   fi
 }
 
 require_termux_packages() {
   info "Updating..."
-  pkg update &> /dev/null \
-    || warn "Update failed, ignore it."
+  pkg update || warn "Update failed, ignore it."
 
   info "Upgrading..."
-  pkg upgrade -y -o Dpkg::Options::="--force-confdef" &> /dev/null \
-    || warn "Upgrade failed, ignore it."
+  pkg upgrade -y || warn "Upgrade failed, ignore it."
 
   # install termux-x11
   if ! which termux-x11 &> /dev/null; then
     info "Installing termux-x11 tools"
-    pkg install -y x11-repo &> /dev/null \
+    pkg install -y x11-repo \
       || die_can_retry "Failed to install package 'x11-repo'"
-    pkg install -y termux-x11-nightly &> /dev/null \
+    pkg install -y termux-x11-nightly \
       || die_can_retry "Failed to install package 'termux-x11'"
   fi
 
@@ -53,21 +51,21 @@ require_termux_packages() {
 
   if ! which git &> /dev/null; then
     info "Installing git"
-    pkg install -y git &> /dev/null \
+    pkg install -y git \
       || die_can_retry "Failed to install package 'git'"
   fi
+  clear
 }
 
 install_os() {
   # check rootfs
   if ! [[ -d "$ROOTFS" ]]; then
     info "Installing ${CONFIG_OS} with proot-distro..."
-    proot-distro install "$CONFIG_OS" &> /dev/null \
+    proot-distro install "$CONFIG_OS" \
       || die_can_retry "Failed to install ${CONFIG_OS}"
   fi
 }
 
-# NOTE: no sure git pull & rebase will work if there is a broken push
 get_wine_desktop_installer() {
   # update wine-desktop-installer
   if [[ -d "wine-desktop-installer" ]]; then
@@ -83,7 +81,7 @@ get_wine_desktop_installer() {
   fi
 }
 
-copy_files() {
+cache_wine_desktop() {
   # copy wine-desktop-installer to proot
   info "Install wine-desktop-installer to proot"
   if [[ -d "$ROOTFS_CACHE/wine-desktop" ]]; then
@@ -139,16 +137,16 @@ try_login_installation() {
 }
 
 main() {
-  check_config_os
   check_env
 
+  export CONFIG_OS="ubuntu"
   export ROOTFS="$PREFIX/var/lib/proot-distro/installed-rootfs/${CONFIG_OS}"
   export ROOTFS_CACHE="$ROOTFS/var/cache"
 
   require_termux_packages
   install_os
   get_wine_desktop_installer
-  copy_files
+  cache_wine_desktop
   install_login_installation
   install_start_bin
 

@@ -24,17 +24,12 @@ builder() {
 
   while read -r out_line; do
     source_file=$(echo "$out_line" | sed -n -E -r "s/$regex/\2/p")
-    # TODO: source files in source_file recursively?
-
     local prefix="$src_dirname"
     if [[ -n "$source_file" ]]; then
       source_file="$(eval echo "$source_file")"
       if [[ -f "$prefix/$source_file" ]]; then
         local indent
         indent="$(echo "$out_line" | sed -n -E -r "s/$regex/\1/p")"
-        if [[ "$source_file" == "config.sh" ]]; then
-          prefix="$PWD"
-        fi
         while read -r sourced_line; do
           echo "${indent}${sourced_line}" >> "$2"
         done < "$prefix/$source_file"
@@ -64,14 +59,6 @@ Options:
   --help, -h    Show this help
 __EOF__
 }
-
-if ! [[ -f "$PWD/config.sh" ]]; then
-  cp "src/config.sh" "$PWD/config.sh"
-  echo "Please edit config.sh, then retry."
-  exit 1
-fi
-
-source config.sh
 
 if [[ $# -ne 1 ]]; then
   usage

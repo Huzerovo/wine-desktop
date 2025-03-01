@@ -1,17 +1,11 @@
 #!/usr/bin/bash
 
-source config.sh
-source check_config.sh
 source common.sh
-
-# shellcheck disable=SC1090,SC1091
-source $CONFIG_OS/os_functions.sh
 
 user_exist() {
   grep -e "^$1:" /etc/passwd &> /dev/null
 }
 
-# NOTE: no sure it can work with a complex input
 invalid_user() {
   if [[ "$1" == "$(echo "$1" | sed -n -E -r "/^[a-z][a-z0-9_-]{2,30}$/p")" ]]; then
     return 1
@@ -88,6 +82,40 @@ update_start_bin() {
   fi
 }
 
+os_update_mirrors() {
+  local list="/etc/apt/sources.list"
+  local listdeb822="/etc/apt/sources.list.d/ubuntu.sources"
+
+  if [[ -f "$listdeb822" ]]; then
+    if ! [[ -f "${listdeb822}.backup" ]]; then
+      cp "$listdeb822" "${listdeb822}.backup"
+    fi
+    cat > "$listdeb822" << __EOF__
+Types: deb
+URIs: http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports
+Suites: noble noble-updates noble-backports
+Components: main restricted universe multiverse
+Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+
+Types: deb
+URIs: http://ports.ubuntu.com/ubuntu-ports/
+Suites: noble-security
+Components: main restricted universe multiverse
+Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+__EOF__
+  else
+    if ! [[ -f "${list}.backup" ]]; then
+      cp "$list" "${list}.backup"
+    fi
+    cat > "$list" << __EOF__
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ noble main restricted universe multiverse
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ noble-updates main restricted universe multiverse
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ noble-backports main restricted universe multiverse
+deb http://ports.ubuntu.com/ubuntu-ports/ noble-security main restricted universe multiverse
+__EOF__
+  fi
+}
+
 update_mirrors() {
   # update and install essential packages
   info "Do you want to change the apt mirror?"
@@ -109,7 +137,8 @@ update_mirrors() {
 
 upgrade_packages() {
   info "Upgrading packages..."
-  os_upgrade_packages &> /dev/null
+  apt-get update -yqq
+  apt-get upgrade -yqq
 }
 
 __grant_sudo_privilege() {
@@ -124,7 +153,7 @@ __grant_sudo_privilege() {
 
 install_packages() {
   info "Installing 'sudo'..."
-  os_install_packages "sudo" &> /dev/null \
+  apt-get install -yqq "sudo" &> /dev/null \
     || die_can_retry "Failed to install package 'sudo'"
 
   if ! [[ "$PROOT_USER" == "root" ]]; then
@@ -164,7 +193,7 @@ install_packages() {
       die "Unsupport os: $CONFIG_OS"
       ;;
   esac
-  os_install_packages "${packages[@]}" &> /dev/null \
+  apt-get install -yqq "${packages[@]}" &> /dev/null \
     || warn "Failed to install some required packages, but can ignore it."
 }
 
@@ -208,7 +237,6 @@ main() {
   exit 0
 }
 
-check_config_os
 main
 
 # vim: ts=2 sts=2 sw=2
