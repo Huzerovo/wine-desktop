@@ -84,16 +84,16 @@ get_wine_desktop_installer() {
 cache_wine_desktop() {
   # copy wine-desktop-installer to proot
   info "Install wine-desktop-installer to proot"
-  if [[ -d "$ROOTFS_CACHE/wine-desktop" ]]; then
-    rm -rf "$ROOTFS_CACHE/wine-desktop"
+  if [[ -d "$ROOTFS_CACHE/wine-desktop-installer" ]]; then
+    rm -rf "$ROOTFS_CACHE/wine-desktop-installer"
   fi
-  cp -r "./wine-desktop-installer" "$ROOTFS_CACHE/wine-desktop"
+  mv "./wine-desktop-installer" "$ROOTFS_CACHE/wine-desktop-installer"
 }
 
 install_login_installation() {
   # install login-installation
   mkdir -p "$ROOTFS/etc/profile.d"
-  cp "./login-installation.sh" "$ROOTFS/etc/profile.d/login-installation.sh"
+  mv "./login-installation.sh" "$ROOTFS/etc/profile.d/login-installation.sh"
 }
 
 install_start_bin() {
@@ -103,7 +103,7 @@ install_start_bin() {
   if [[ -f "$HOME/.local/bin/start-wine-desktop" ]]; then
     warn "Found exist 'start-wine-desktop', keep it."
   else
-    cp "start-wine-desktop" "$HOME/.local/bin" \
+    mv "start-wine-desktop" "$HOME/.local/bin" \
       || die_can_retry "Can not install start bin"
   fi
   chmod +x "$HOME/.local/bin/start-wine-desktop"

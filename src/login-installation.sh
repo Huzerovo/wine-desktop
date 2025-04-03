@@ -61,13 +61,17 @@ choose_user() {
 create_wine_desktop() {
   if [[ -d "$PROOT_HOME" ]]; then
     # update old installation
-    mkdir -p "$WINE_DESKTOP_CONTAINER"
-    cp -rf "/var/cache/wine-desktop" "$(dirname "$WINE_DESKTOP_CONTAINER")"
+    if [[ ! -d "$WINE_DESKTOP_CONTAINER" ]]; then
+      mkdir -p "$WINE_DESKTOP_CONTAINER"
+    fi
+    if [[ -d "$WINE_DESKTOP_CONTAINER/installer" ]]; then
+      rm -rf "$WINE_DESKTOP_CONTAINER/installer"
+    fi
+    mv "/var/cache/wine-desktop-installer" "$WINE_DESKTOP_CONTAINER/installer"
     # chown "$PROOT_USER":"$PROOT_USER" -R "$PROOT_HOME"
-    rm -rf "/var/cache/wine-desktop"
   else
     warn "User is created but can not find the home."
-    warn "Please move '/var/cache/wine-desktop' to '$WINE_DESKTOP_CONTAINER' manually."
+    warn "Please move '/var/cache/wine-desktop-installer' to '$WINE_DESKTOP_CONTAINER' manually."
   fi
 }
 
@@ -168,31 +172,14 @@ install_packages() {
   #       installed by 'make install' now.
   # TODO: move 'gcc-arm-linux-gnueabihf' to wine-desktop-installer, install it
   #       when try to install box86
-  case "$CONFIG_OS" in
-    debian)
-      packages=(
-        "git"
-        "wget"
-        "cmake"
-        "gcc-arm-linux-gnueabihf"
-        "dpkg-dev"
-        "dh-cmake"
-      )
-      ;;
-    ubuntu)
-      packages=(
-        "git"
-        "wget"
-        "cmake"
-        "gcc-arm-linux-gnueabihf"
-        "dpkg-dev"
-        "dh-cmake"
-      )
-      ;;
-    *)
-      die "Unsupport os: $CONFIG_OS"
-      ;;
-  esac
+  packages=(
+    "git"
+    "wget"
+    "cmake"
+    "gcc-arm-linux-gnueabihf"
+    "dpkg-dev"
+    "dh-cmake"
+  )
   apt-get install -yqq "${packages[@]}" &> /dev/null \
     || warn "Failed to install some required packages, but can ignore it."
 }
@@ -202,9 +189,9 @@ install_installer_installation() {
   cat > "/etc/profile.d/installer-installation.sh" <<- __EOF__
 #!/usr/bin/bash
 
-if [[ -n "\$WINE_DESKTOP_CONTAINER" ]]; then
-  cd "\$WINE_DESKTOP_CONTAINER"
-  bash "\$WINE_DESKTOP_CONTAINER/updater"
+if [[ -d "\$WINE_DESKTOP_CONTAINER/installer" ]]; then
+  cd "\$WINE_DESKTOP_CONTAINER/installer"
+  bash "\$WINE_DESKTOP_CONTAINER/installer/updater"
   # Do installation for install wine, winetricks, box
   # TODO: finish wine-desktop-installer for ubuntu and uncomment it
   # wine-desktop-installer --all

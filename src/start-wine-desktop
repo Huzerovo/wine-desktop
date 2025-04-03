@@ -14,6 +14,11 @@ CLEAR_ANDROID_ENV=1
 # if set to 1, remove termux bin and android bin in PATH
 ISOLATED_PATH=1
 
+# those are configurated by login installation
+PROOT_USER="root"
+PROOT_HOME="/root"
+WINE_DESKTOP_CONTAINER="$PROOT_HOME/.local/share/wine-desktop"
+
 # See 'proot-distro login --help'
 # you can add proot arguments here
 declare -a PROOT_ARGS
@@ -21,12 +26,6 @@ PROOT_ARGS=(
   --bind "$HOME":"/mnt/termux-home"
   --bind "/sdcard":"/mnt/sdcard"
 )
-
-# DO NOT EDIT CONFIG BELOW
-# those are configurated by login installation
-PROOT_USER="root"
-PROOT_HOME="/root"
-WINE_DESKTOP_CONTAINER="$PROOT_HOME/.local/share/wine-desktop"
 
 PROOT_ARGS+=(
   --env RESOLUTION="$RESOLUTION"
